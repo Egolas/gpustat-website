@@ -1,0 +1,15 @@
+[Unit]
+Description=gpustat-website
+After=basic.service //启动顺序
+
+
+[Service]
+Type=simple
+KillMode=control-group
+WorkingDirectory=${dirpath}/gpustat-website
+ExecStart=bash ${dirpath}/gpustat-website/gpustat-website.sh
+
+
+[Install]
+Alias=gpustat-website.service
+WantedBy=multi-user.target

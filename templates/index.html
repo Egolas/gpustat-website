@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+
+      // Load the Visualization API and the corechart package.
+      google.charts.load('current', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(render_data);
+        
+      function render_data(){
+      var httpRequest = new XMLHttpRequest();
+      var modeObj = document.getElementById('mode')
+            // console.log(modeObj.textContent)
+        httpRequest.open('GET','http://'+window.location.host+'/get_data?mode='+modeObj.textContent, true);
+        httpRequest.send();
+        httpRequest.onreadystatechange = function () {
+            if (httpRequest.readyState == 4 && httpRequest.status == 200) {
+                var jsonStr = httpRequest.responseText;
+                // console.log(jsonStr);
+                data = JSON.parse(jsonStr)
+                char_width = 800
+                char_height = 600
+                draw_Chart(data, 'gpu_chart_div', 'Average GPU Usage (When Use)', ['username', 'avg_gpu_num'], char_width, char_height)
+                draw_Chart(data, 'mem_chart_div', 'Total Use Time/min·GPU', ['username', 'use_time'], char_width, char_height)
+                draw_Chart(data, 'time_chart_div', 'Average Memory Usage/GPU', ['username', 'avg_mem_usage'], char_width, char_height)
+            }
+        };
+        };
+
+      function draw_Chart(raw_data, part, title, elements, width, height) {
+        
+        // Create the data table.
+        var data = new google.visualization.DataTable();
+        raw_data = Array.from(raw_data)
+        // console.log(raw_data)
+        data.addColumn('string', 'Topping');
+        data.addColumn('number', 'Slices');
+        raw_data.forEach(element => {
+            // console.log(element)
+            data.addRow([element.username, parseFloat(element.avg_gpu_num)])
+        });
+
+        var options = {'title':title,
+                       'width':width,
+                       'height':height};
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById(part));
+        chart.draw(data, options);
+      }
+
+
+
+    </script>
+  </head>
+
+  <body>
+    <!--Div that will hold the pie chart-->
+    <div id="title"><h1>{{context.title}}</h1></div>
+    <div id='subtitle'>
+        {% for option in context.all_options %}
+            {% if option == context.mode%}
+                <b id='mode'>{{context.mode}}</b>
+            {% else %}
+	              <a href=?page={{option}}>{{option}}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div style="padding-left: 5px; padding-right: 5px; overflow: auto;">
+    <div id="gpu_chart_div" style="float: left;"></div>
+    <div id="time_chart_div" style="float: left;"></div>
+    <div hidden id="mem_chart_div" style="float: left;"></div>
+  </div>
+  </body>
+</html>

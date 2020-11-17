@@ -1,0 +1,110 @@
+<html>
+  <!-- <meta http-equiv="refresh" content="10"> -->
+  <head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      // Load the Visualization API and the corechart package.
+      google.charts.load('current', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(render_data);
+        
+      function render_data(){
+        // Callback that creates and populates a data table,
+        // instantiates the pie chart, passes in the data and
+        // draws it.
+        console.log("render_data")
+        var httpRequest = new XMLHttpRequest();//第一步：建立所需的对象
+        var modeObj = document.getElementById('mode')
+        // var serverObj = document.getElementById('server')
+              // console.log(modeObj.textContent)
+          httpRequest.open('GET','http://'+window.location.host+'/get_data?mode='+modeObj.textContent, true);//第二步：打开连接  将请求参数写在url中  ps:"./Ptest.php?name=test&nameone=testone"
+          httpRequest.send();//第三步：发送请求  将请求参数写在URL中
+          /**
+          * 获取数据后的处理程序
+          */
+          httpRequest.onreadystatechange = function () {
+              if (httpRequest.readyState == 4 && httpRequest.status == 200) {
+                  var jsonStr = httpRequest.responseText;//获取到json字符串，还需解析
+                  // console.log(jsonStr);
+                  data = JSON.parse(jsonStr)
+                  var my_container = document.getElementById("host_chart_div") 
+                  for(var key in data){
+                      var new_element = document.createElement('div') 
+                      new_element.setAttribute('id', data[key].hostname+'_chart_div',);
+                      new_element.setAttribute('style', "float: left; width: 48%;")
+                      my_container.appendChild(new_element); 
+                      draw_host_Chart(data[key])
+                  }
+              }
+          };
+        };
+
+      function draw_host_Chart(raw_data) {
+        
+        // Create the data table.
+        // console.log(raw_data)
+        records = Array.from(raw_data.records)
+        var data = google.visualization.arrayToDataTable(records)
+
+        // Set chart options
+
+        var options_fullStacked = {
+          title: raw_data.hostname + ': ' + raw_data.ip,
+          isStacked: 'percent',
+          height: 300,
+          legend: {position: 'top', maxLines: 3},
+          hAxis: {
+            minValue: 0,
+            ticks: [0, .3, .6, .9, 1]
+          }
+        };
+        // console.log(raw_data.hostname+'_chart_div')
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.BarChart(document.getElementById(raw_data.hostname+'_chart_div'));
+        chart.draw(data, options_fullStacked);
+      }
+
+
+    window.onload = function() {
+      var btn = document.getElementById('switchAutoRefresh')
+      var timer;
+
+      if (btn.textContent == 'auto-refresh:on'){
+        timer = setInterval(render_data,5000
+          );
+      }
+      function switch_auto_refresh() {
+        if (btn.textContent == 'auto-refresh:on'){
+          btn.innerHTML='auto-refresh:off'
+          clearInterval(timer)
+        }
+        else{
+          btn.innerHTML='auto-refresh:on'
+          timer = setInterval(render_data,5000
+          );
+        }
+      }
+      btn.onclick = switch_auto_refresh;
+    }
+    console.log("host:"+window.location.host)
+    </script>
+  </head>
+
+  <body>
+    <!--Div that will hold the pie chart-->
+    <div id="title"><h1>{{context.title}}</h1></div>
+    <div id='subtitle'>
+        {% for option in context.all_options %}
+            {% if option == context.mode%}
+                <b id='mode'>{{context.mode}}</b>
+            {% else %}
+	              <a href=?page={{option}}>{{option}}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div><button hidden id="switchAutoRefresh" type="button" class="btn btn-primary">auto-refresh:on</button></div>
+    <div id="host_chart_div" style="padding-left: 5px; padding-right: 5px; overflow: auto;"></div>
+  </body>
+</html>

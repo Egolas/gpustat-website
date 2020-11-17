@@ -1,0 +1,58 @@
+hosts:
+  lab407-1:
+    ip: '100.64.183.172'
+    gpus:
+      - '2080ti'
+      - '2080ti'
+      - '2080ti'
+      - '2080ti'
+  lab407-2:
+    ip: '100.64.171.140'
+    gpus:
+      - 'titanv'
+      - 'titanv'
+  lab134:
+    ip: '100.64.171.51'
+    gpus:
+      - 'titanx'
+      - 'titanx'
+      - 'titanx'
+  lab215-1:
+    ip: '100.64.141.113'
+    gpus:
+      - 'titanv'
+      - 'titanv'
+  lab215-2:
+    ip: '100.64.141.133'
+    gpus:
+      - 'titanv'
+      - 'titanv'
+  lab215-3:
+    ip: '100.64.148.208'
+    gpus:
+      - 'titanxpascal'
+      - 'titanxpascal'
+      - 'titanxpascal'
+      - 'titanxpascal'
+
+gpu_info:
+  titanv:
+    name: 'TITAN V'
+    memory:
+      free: 12066
+      total: 12066
+  2080ti:
+    name: 'GeForce RTX 2080 Ti'
+    memory:
+      free: 11019
+      total: 11019
+  titanx:
+    name: 'GeForce GTX TITAN X'
+    memory:
+      free: 12212
+      total: 12212
+  titanxpascal:
+    name: 'TITAN X (Pascal)'
+    memory:
+      free: 12196
+      total: 12196

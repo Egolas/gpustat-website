@@ -6,10 +6,11 @@
 - Show GPU usage in `24 hours` / `1 week` / `all time`
 
 ## Requests
-- flask
-- mysql
-- mysql-connector-python
-- [gpu-statistics][gpu-statistics-link]
+- mysql-server
+- python packages
+    - flask
+    - mysql-connector-python
+    - [gpu-statistics][gpu-statistics-link]
 
 ## Deployment
 1. Edit `gpu_info.yaml` with your actual hosts' and gpus' info

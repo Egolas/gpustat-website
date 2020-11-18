@@ -20,7 +20,9 @@
 > sudo chmod +x ./gpustat-website.sh
 4. Copy `gpustat-website.service` to `/lib/systemd/system`
 > sudo cp  ./gpustat-website.service /lib/systemd/system
-5. Enable system service
+5. Start system service
+> sudo systemctl start gpustat-website.service
+6. (Optional)Enable system service
 > sudo systemctl enable gpustat-website.service
 
 [gpu-statistics-link]: https://github.com/Egolas/gpu-statistics

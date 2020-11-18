@@ -5,7 +5,7 @@
     - auto refresh every `5s`.
 - Show GPU usage in `24 hours` / `1 week` / `all time`
 
-## Requests
+## Requirements
 - mysql-server
 - python packages
     - flask

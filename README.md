@@ -12,6 +12,7 @@
 - [gpu-statistics][gpu-statistics-link]
 
 ## Deployment
+1. Edit `gpu_info.yaml` with your actual hosts' and gpus' info
 1. Edit `host_names` and `database_config` in `app.py` (not necessary for `reporter.py`, in which it's just used for debug)
 2. Edit `dirpath` in `gpustat-website.service` and `gpustat-website.sh`
 3. Set `gpustat-website.sh` runable,

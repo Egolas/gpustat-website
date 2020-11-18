@@ -24,8 +24,8 @@
                 char_width = 800
                 char_height = 600
                 draw_Chart(data, 'gpu_chart_div', 'Average GPU Usage (When Use)', ['username', 'avg_gpu_num'], char_width, char_height)
-                draw_Chart(data, 'mem_chart_div', 'Total Use Time/min·GPU', ['username', 'use_time'], char_width, char_height)
-                draw_Chart(data, 'time_chart_div', 'Average Memory Usage/GPU', ['username', 'avg_mem_usage'], char_width, char_height)
+                draw_Chart(data, 'time_chart_div', 'Total Use Time/min·GPU', ['username', 'use_time'], char_width, char_height)
+                draw_Chart(data, 'mem_chart_div', 'Average Memory Usage/GPU', ['username', 'avg_mem_usage'], char_width, char_height)
             }
         };
         };
@@ -40,7 +40,7 @@
         data.addColumn('number', 'Slices');
         raw_data.forEach(element => {
             // console.log(element)
-            data.addRow([element.username, parseFloat(element.avg_gpu_num)])
+            data.addRow([element[elements[0]], parseFloat(element[elements[1]])])
         });
 
         var options = {'title':title,

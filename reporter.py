@@ -57,7 +57,7 @@ def get_timeslice_record(start_timestamp:float, end_timestamp:float, table: Unio
                 COUNT(DISTINCT (hostname + `gpu.index`)) as gpu_num,
                 sum(`memory.usage`)                      as sum_mem_usage
             from {table}
-            where timestamp > {start_timestamp} and timestamp < {end_timestamp}
+            where timestamp > {start_timestamp} and timestamp < {end_timestamp} and `memory.usage` > 512
             GROUP BY username, timestamp, hostname
         ) as stat
         group by username'''

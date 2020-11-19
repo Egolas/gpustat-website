@@ -29,12 +29,16 @@
                   var jsonStr = httpRequest.responseText;//获取到json字符串，还需解析
                   // console.log(jsonStr);
                   data = JSON.parse(jsonStr)
-                  var my_container = document.getElementById("host_chart_div") 
+                  var chart_container = document.getElementById("host_chart_div") 
+                  while(chart_container.lastChild)
+                  {
+                    chart_container.removeChild(chart_container.lastChild);
+                  }
                   for(var key in data){
                       var new_element = document.createElement('div') 
                       new_element.setAttribute('id', data[key].hostname+'_chart_div',);
                       new_element.setAttribute('style', "float: left; width: 48%;")
-                      my_container.appendChild(new_element); 
+                      chart_container.appendChild(new_element); 
                       draw_host_Chart(data[key])
                   }
               }

@@ -9,7 +9,7 @@
 - mysql-server
 - python packages
     - flask
-    - yaml
+    - pyyaml
     - mysql-connector-python
     - [gpu-statistics][gpu-statistics-link]
 
@@ -27,3 +27,6 @@
 > sudo systemctl enable gpustat-website.service
 
 [gpu-statistics-link]: https://github.com/Egolas/gpu-statistics
+
+## TODO
+1. Optimize database, auto gpu-info registration

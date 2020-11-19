@@ -9,6 +9,7 @@
 - mysql-server
 - python packages
     - flask
+    - yaml
     - mysql-connector-python
     - [gpu-statistics][gpu-statistics-link]
 

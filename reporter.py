@@ -48,17 +48,23 @@ def current_record_qurey(timestamp:float, table: Union[str, None] = None):
     return f'select * from `{table}` where timestamp > {timestamp}'
 
 def get_timeslice_record(start_timestamp:float, end_timestamp:float, table: Union[str, None] = None):
-    qurey = f'''select username, sum(gpu_num) as use_time, avg(gpu_num) as avg_gpu_num, avg(sum_mem_usage/gpu_num) as avg_mem_usage
+    qurey = f'''
+        select username,
+        sum(gpu_num) as use_time,
+        COUNT(DISTINCT(hostname)) as avg_host_num,
+        COUNT(DISTINCT(hostname)) * avg(gpu_num) as avg_gpu_num,
+        avg(sum_mem_usage/gpu_num) as avg_mem_usage
         from
         (
             select hostname,
-                timestamp,
                 username,
                 COUNT(DISTINCT (hostname + `gpu.index`)) as gpu_num,
                 sum(`memory.usage`)                      as sum_mem_usage
             from {table}
-            where timestamp > {start_timestamp} and timestamp < {end_timestamp} and `memory.usage` > 512
-            GROUP BY username, timestamp, hostname
+            where timestamp > {start_timestamp}
+            and timestamp < {end_timestamp}
+            and `memory.usage` > {min_mem_usage}
+            GROUP BY username, hostname, timestamp
         ) as stat
         group by username'''
     return qurey

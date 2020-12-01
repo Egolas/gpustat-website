@@ -6,14 +6,15 @@ import mysql.connector
 import yaml
 import copy
 
+
 gpu_info = None
 with open('./gpu_info.yaml', 'r') as file:
     gpu_info = yaml.load(file, Loader=yaml.FullLoader)
 
 database_config = {
-    'user': 'user',
-    'password': 'password',
-    'host': '0.0.0.0',
+    'user': 'monitor',
+    'password': 'newlab',
+    'host': '100.64.171.140',
     'database': 'gpustat',
     'raise_on_warnings': True,
     'auth_plugin': 'caching_sha2_password'
@@ -47,24 +48,21 @@ def to_list(ori):
 def current_record_qurey(timestamp:float, table: Union[str, None] = None):
     return f'select * from `{table}` where timestamp > {timestamp}'
 
-def get_timeslice_record(start_timestamp:float, end_timestamp:float, table: Union[str, None] = None):
-    qurey = f'''
-        select username,
-        sum(gpu_num) as use_time,
-        COUNT(DISTINCT(hostname)) as avg_host_num,
-        COUNT(DISTINCT(hostname)) * avg(gpu_num) as avg_gpu_num,
-        avg(sum_mem_usage/gpu_num) as avg_mem_usage
+def get_timeslice_record(start_timestamp:float, end_timestamp:float, table: Union[str, None] = None, min_mem_usage=512):
+    start_timestamp /= 60
+    end_timestamp /= 60
+    qurey = f'''select username, sum(gpu_num) as use_time, avg(gpu_num) as avg_gpu_num, avg(sum_mem_usage/gpu_num) as avg_mem_usage
         from
         (
-            select hostname,
-                username,
-                COUNT(DISTINCT (hostname + `gpu.index`)) as gpu_num,
+            select minstamp, username,
+                COUNT(DISTINCT (CONCAT(hostname,`gpu.index`))) as gpu_num,
                 sum(`memory.usage`)                      as sum_mem_usage
-            from {table}
-            where timestamp > {start_timestamp}
-            and timestamp < {end_timestamp}
-            and `memory.usage` > {min_mem_usage}
-            GROUP BY username, hostname, timestamp
+            from (
+                     select timestamp DIV 60 as minstamp, hostname, username, `gpu.index`, `memory.usage`
+                     from {table}
+            ) as minview
+            where minstamp > {start_timestamp} and minstamp < {end_timestamp} and `memory.usage` > {min_mem_usage}
+            GROUP BY username, minstamp
         ) as stat
         group by username'''
     return qurey
@@ -80,6 +78,10 @@ def get_record(config:dict, host_names:list, mode='curr', table: Union[str, None
         end_timestamp = time.time()
         start_timestamp = end_timestamp - 60.0 
         record_query = get_timeslice_record(start_timestamp=start_timestamp, end_timestamp=end_timestamp, table=table)
+    elif mode == 'hour':
+        end_timestamp = time.time()
+        start_timestamp = end_timestamp - 60.0 * 60.0
+        record_query = get_timeslice_record(start_timestamp=start_timestamp, end_timestamp=end_timestamp, table=table)
     elif mode == 'day':
         end_timestamp = time.time()
         start_timestamp = end_timestamp - 60.0 * 60.0 * 24.0
@@ -87,6 +89,10 @@ def get_record(config:dict, host_names:list, mode='curr', table: Union[str, None
     elif mode == 'week':
         end_timestamp = time.time()
         start_timestamp = end_timestamp - 60.0 * 60.0 * 24.0 * 7
+        record_query = get_timeslice_record(start_timestamp=start_timestamp, end_timestamp=end_timestamp, table=table)
+    elif mode == 'month':
+        end_timestamp = time.time()
+        start_timestamp = end_timestamp - 60.0 * 60.0 * 24.0 * 30
         record_query = get_timeslice_record(start_timestamp=start_timestamp, end_timestamp=end_timestamp, table=table)
     elif mode == 'all':
         end_timestamp = time.time()
